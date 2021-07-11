@@ -21,6 +21,74 @@
 }
 
 .login-btn {
-    margin-top: 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.form-control-container{
+    display: flex;
+    flex-direction: column;
+    justify-content:stretch;
+    align-items: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.form-control-registeration {
+    width: 90%;
+}
+
+.form-control-login {
+    width: 80%;
+}
+
+.dispBlock {
+    display: block;
+}
+
+.dispNone {
+    display: none;
+}
+
+.login-div {
+    margin: 15% 40%;
+    background: white;
+    padding: 15px;
+    border-radius: 3px;
+}
+
+.logged-in-user-first-name-div{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: white;
+    margin: 15px 0px;
+}
+
+.header-login-btn-div {
+    margin-top: 10px;
     margin-bottom: 5px;
+    cursor: pointer;
+}
+
+.loggedInUserName-para {
+    margin: 0px;
+}
+
+.account-options-container{
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    width: 100px;
+    background-color: white;
+    border-style: solid;
+    border-color: #cbb9b9;
+    border-width: 2px;
+    border-radius: 5px;
+    box-shadow: 0px 1px 2px 0px;
+    padding: 10px;
+    color: black;
+    font-weight: 500;
+    right: 5px;
+    cursor: pointer;
 }
