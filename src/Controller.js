@@ -4,10 +4,6 @@ import Home from './screens/home/Home';
 
 class Controller extends Component {
 
-    constructor() {
-      super();
-    }
-
     // controller renderer function with routes configuration
     render() {
         return (
