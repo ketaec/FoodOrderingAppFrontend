@@ -13,6 +13,7 @@ import Modal from "react-modal";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import Typography from "@material-ui/core/Typography";
+import Snackbar from '@material-ui/core/Snackbar';
 import { withStyles } from "@material-ui/core/styles";
 import './Header.css';
 
@@ -67,6 +68,8 @@ class Header extends Component {
             pswd: "",
             contact: "",
             openOptions: false,
+            showLoggedInSuccessfullyMessage: false,
+            showSignupSuccessfullyMessage: false,
         }
     }
 
@@ -87,7 +90,7 @@ class Header extends Component {
     };
 
     openModalHandler = () => {
-        this.setState({ isModalOpen: true, value: 0 });
+        this.setState({ isModalOpen: true, value: 0});
     };
 
     closeModalHandler = () => {
@@ -205,12 +208,8 @@ class Header extends Component {
               that.setState({
                 loggedIn: true,
                 loggedInUserFirstName: JSON.parse(this.responseText).first_name,
-                loggedInSuccessfullyMessageClass: "show",
+                showLoggedInSuccessfullyMessage: true,
               });
-              // After 3 seconds, remove the show class from DIV
-              setTimeout(function () {
-                that.setState({ loggedInSuccessfullyMessageClass: "" });
-              }, 3000);
               that.closeModalHandler();
             }
           }
@@ -348,12 +347,8 @@ class Header extends Component {
               that.setState({
                 isModalOpen: true,
                 value: 0,
-                registeredSuccessfullyMessageClass: "show",
+                showSignupSuccessfullyMessage: true,
               });
-              // After 3 seconds, remove the show class from DIV
-              setTimeout(function () {
-                that.setState({ registeredSuccessfullyMessageClass: "" });
-              }, 3000);
             } else {
               //this.state.contactformAlreadyExists
               that.setState({ contactformRequired: "dispNone" });
@@ -414,7 +409,14 @@ class Header extends Component {
         // console.log(sessionStorage.getItem("access-token"));
         xhrSignup.send(dataSignUp);
     };
-   
+
+    snackbarMessageClose = (event, reason) => {
+        if (reason === 'clickaway') {
+          return;
+        }
+        this.setState({ showLoggedInSuccessfullyMessage: false, showSignupSuccessfullyMessage: false });
+    };
+
     //header renderer function
     render() {
         const { classes } = this.props;
@@ -695,6 +697,28 @@ class Header extends Component {
                         </div>
                     )}
                 </div>
+                {/* registration successful message */}
+                <Snackbar
+                    anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                    }}
+                    open={this.state.showSignupSuccessfullyMessage}
+                    autoHideDuration={3000}
+                    onClose={this.snackbarMessageClose}
+                    message="Registered successfully! Please login now!"
+                />
+
+                <Snackbar
+                    anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                    }}
+                    open={this.state.showLoggedInSuccessfullyMessage}
+                    autoHideDuration={3000}
+                    onClose={this.snackbarMessageClose}
+                    message="Logged in successfully!"
+                />
             </div>
             
         )
