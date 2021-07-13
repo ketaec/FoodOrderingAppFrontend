@@ -417,6 +417,11 @@ class Header extends Component {
         this.setState({ showLoggedInSuccessfullyMessage: false, showSignupSuccessfullyMessage: false });
     };
 
+    searchRestaurantHandler = (event) => {
+        console.log(event.target.value);
+        this.props.searchHandler(event);
+    }
+
     //header renderer function
     render() {
         const { classes } = this.props;
@@ -444,7 +449,7 @@ class Header extends Component {
                             <TextField
                             style={{ width: 300 }}
                             placeholder="Search by Restaurant name"
-                            onChange={this.filterRestaurantHandler}
+                            onChange={this.searchRestaurantHandler}
                             InputProps={{
                                 startAdornment: (
                                 <InputAdornment position="start">
