@@ -93,6 +93,10 @@ class Home extends Component {
 
     }
 
+    restaurantCardOnClickHandler = (restaurantId) => {
+        this.props.history.push('/restaurant/' + restaurantId);
+    }
+
     render() {
         return (
             <div>
@@ -114,7 +118,7 @@ class Home extends Component {
                     >
                         {this.state.restaurants.map(restaurant => (
                             <ImageListItem
-                                onClick={() => this.restaurantCardTileOnClickHandler(restaurant.id)}
+                                onClick={() => this.restaurantCardOnClickHandler(restaurant.id)}
                                 key={'restaurant' + restaurant.id}
                             >
                                 <Card className='card' style={{ textDecoration: 'none', cursor: 'pointer' }}>
@@ -136,8 +140,8 @@ class Home extends Component {
                                                 <span className="white">{restaurant.customer_rating}({restaurant.number_customers_rated})</span>
                                             </div>
                                             <div>
-                                                <i className="fa fa-inr" aria-hidden="true">
-                                                    <span>{restaurant.average_price} for two</span> </i>
+                                                <i className="fa fa-inr price-div" aria-hidden="true">
+                                                    <span className="price-div">{restaurant.average_price} for two</span> </i>
                                             </div>
                                         </div>
                                     </CardContent>

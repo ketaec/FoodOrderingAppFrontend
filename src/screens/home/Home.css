@@ -40,3 +40,8 @@
 .grid-div {
     margin: 0px 1%;
 }
+
+.price-div {
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+    font-size: 14px !important;
+}
