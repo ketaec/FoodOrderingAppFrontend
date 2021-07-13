@@ -101,7 +101,52 @@ class Home extends Component {
                     showSearch="true"
                     searchHandler={this.searchHandler}
                 />
-                
+                {this.state.restaurants.length === 0 ?
+                    <Typography className='restaurantMessage' variant='h6'>
+                        No restaurant with the given name.
+                    </Typography>
+                    :
+                    <div className="grid-div">
+                    <ImageList
+                        className='gridList'
+                        cols={this.state.cards}
+                        rowHeight='auto'
+                    >
+                        {this.state.restaurants.map(restaurant => (
+                            <ImageListItem
+                                onClick={() => this.restaurantCardTileOnClickHandler(restaurant.id)}
+                                key={'restaurant' + restaurant.id}
+                            >
+                                <Card className='card' style={{ textDecoration: 'none', cursor: 'pointer' }}>
+                                    <CardMedia
+                                        className='cardMedia'
+                                        image={restaurant.photo_URL}
+                                        title={restaurant.restaurant_name}
+                                    />
+                                    <CardContent className='cardContent'>
+                                        <Typography className='restaurantName' gutterBottom variant='h5' component='h2'>
+                                            {restaurant.restaurant_name}
+                                        </Typography>
+                                        <Typography variant='subtitle1' className='categories'>
+                                            {restaurant.categories}
+                                        </Typography>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <div style={{ display: 'flex', flexDirection: 'row', color: "white", backgroundColor: "#FDD835", padding: 5, justifyContent: 'space-evenly', alignItems: 'center', width: 80 }}>
+                                                <i className="fa fa-star" aria-hidden="true"> </i>
+                                                <span className="white">{restaurant.customer_rating}({restaurant.number_customers_rated})</span>
+                                            </div>
+                                            <div>
+                                                <i className="fa fa-inr" aria-hidden="true">
+                                                    <span>{restaurant.average_price} for two</span> </i>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </ImageListItem>
+                        ))}
+                    </ImageList>
+                    </div>
+                }
             </div>
         )
     }
