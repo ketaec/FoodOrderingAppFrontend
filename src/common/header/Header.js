@@ -445,6 +445,7 @@ class Header extends Component {
                         </div>
                     </Grid>
                     <Grid item xs={12} sm={12} md={6}>
+                      {this.props.showSearch === "true" ?
                         <div className="search-container">
                             <TextField
                             style={{ width: 300 }}
@@ -460,6 +461,8 @@ class Header extends Component {
                             classes={{ root: classes.root}}
                             />
                         </div>
+                        : ""
+                      }
                     </Grid>
                     <Grid item xs={12} sm={12} md={1}>
                         <div className="login-btn">
