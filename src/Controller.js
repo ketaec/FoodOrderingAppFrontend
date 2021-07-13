@@ -4,12 +4,17 @@ import Home from './screens/home/Home';
 
 class Controller extends Component {
 
+    constructor() {
+        super();
+        this.baseUrl= "http://localhost:8080/api";
+    }
+
     // controller renderer function with routes configuration
     render() {
         return (
             <Router>
                 <div className="main-container">
-                    <Route exact path='/' render={(props) => <Home {...props} />} />
+                    <Route exact path='/' render={(props) => <Home {...props} baseUrl={this.baseUrl} />} />
                 </div>
             </Router>
         )
