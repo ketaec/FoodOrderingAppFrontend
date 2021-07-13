@@ -1,0 +1,42 @@
+.restaurantMessage {
+    margin-top: 15px;
+    margin-left: 25px;
+}
+
+.gridList {
+    width: 100%;
+    display: flex; 
+    justify-content : 'space-around';
+}
+
+.card {
+    width: auto;
+    height: 340px;
+    max-height: 340px;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    margin-left: 25px;
+    margin-right: 10px;
+    padding-bottom: 15px;
+    cursor: 'pointer';
+}
+
+.cardMedia {
+    height: 140px
+}
+
+.cardContent {
+    height: 200px
+}
+
+.restaurantName {
+  min-height: 32%;
+}
+
+.categories {
+    min-height: 42%;
+}
+
+.grid-div {
+    margin: 0px 1%;
+}
