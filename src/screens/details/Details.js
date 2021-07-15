@@ -13,6 +13,7 @@ import IconButton from '@material-ui/core/IconButton';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import RemoveIcon from '@material-ui/icons/Remove';
 import AddIcon from '@material-ui/icons/Add';
+import Snackbar from '@material-ui/core/Snackbar';
 
 class Details extends React.Component {
     constructor(props) {
@@ -27,12 +28,13 @@ class Details extends React.Component {
             cartItems: [],
             cartItem: {},
             open: false,
-            cartEmpty: false,
-            nonloggedIn: false,
+            showCartEmpty: false,
+            showNotloggedIn: false,
             itemQuantityDecreased: false,
             itemRemovedFromCart: false,
             itemQuantityIncreased: false,
             itemAddedFromCart: false,
+            showItemAddedMessage: false,
         }
     }
 
@@ -103,7 +105,7 @@ class Details extends React.Component {
             this.setState({orderItems: orderItems});
         }
 
-        this.setState({open: true, cartItem: {}, totalItems: totalItems, totalAmount: totalAmount});
+        this.setState({showItemAddedMessage: true, cartItem: {}, totalItems: totalItems, totalAmount: totalAmount});
     }
 
     removeFromCartHandler = (item) => {
@@ -148,6 +150,27 @@ class Details extends React.Component {
         totalItems += 1;
 
         this.setState({ itemQuantityIncreased: true, totalItems: totalItems, totalAmount: totalAmount });
+    }
+
+    checkoutHandler = () => {
+        if (this.state.totalItems === 0) {
+            this.setState({showCartEmpty: true});
+        } else if (this.state.totalItems > 0 && sessionStorage.getItem('access-token') === null) {
+            this.setState({showNotloggedIn: true});
+        } else {
+            this.props.history.push({
+                pathname: '/checkout/',
+                state: {
+                    orderItems: this.state.orderItems,
+                    total: this.state.totalAmount, restaurantName: this.state.restaurant_name
+                }
+            })
+        }
+    }
+
+    handleClose = () => {
+        this.setState({showItemAddedMessage: false, showNotloggedIn: false, showCartEmpty: false,
+             itemQuantityIncreased: false, itemRemovedFromCart:false});
     }
 
     render() {
@@ -238,7 +261,7 @@ class Details extends React.Component {
                             <Card>
                                 <CardContent>
                                     <div style={{fontWeight: "bold"}}>
-                                        <i style={{paddingRight: "20px"}}>
+                                        <i style={{paddingRight: "20px", fontStyle:"normal"}}>
                                             <Badge className="badge" badgeContent={this.state.totalItems}
                                                    color="primary" showZero>
                                                 <ShoppingCartIcon/>
@@ -315,6 +338,41 @@ class Details extends React.Component {
                             </Card>
                         </div>
                 </div>
+                <Snackbar
+                    anchorOrigin={{vertical: 'bottom',horizontal: 'left',}}
+                    open={this.state.showItemAddedMessage}
+                    autoHideDuration={3000}
+                    onClose={this.handleClose}
+                    message="Item added to cart!"
+                />
+                <Snackbar
+                    anchorOrigin={{vertical: 'bottom',horizontal: 'left',}}
+                    open={this.state.itemQuantityIncreased}
+                    autoHideDuration={3000}
+                    onClose={this.handleClose}
+                    message="Item quantity increased by 1!"
+                />
+                <Snackbar
+                    anchorOrigin={{vertical: 'bottom',horizontal: 'left',}}
+                    open={this.state.itemRemovedFromCart}
+                    autoHideDuration={3000}
+                    onClose={this.handleClose}
+                    message="Item removed from cart!"
+                />
+                <Snackbar
+                    anchorOrigin={{vertical: 'bottom',horizontal: 'left',}}
+                    open={this.state.showNotloggedIn}
+                    autoHideDuration={3000}
+                    onClose={this.handleClose}
+                    message="Please login first!"
+                />
+                <Snackbar
+                    anchorOrigin={{vertical: 'bottom',horizontal: 'left',}}
+                    open={this.state.showCartEmpty}
+                    autoHideDuration={3000}
+                    onClose={this.handleClose}
+                    message="Please add an item to your cart!"
+                />
             </div>
         )
     }
