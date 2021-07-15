@@ -23,10 +23,16 @@ class Details extends React.Component {
             locality: "",
             totalAmount: 0,
             totalItems: 0,
-            cartEmpty: false,
             orderItems: {id: null, items: [], total: 0},
             cartItems: [],
             cartItem: {},
+            open: false,
+            cartEmpty: false,
+            nonloggedIn: false,
+            itemQuantityDecreased: false,
+            itemRemovedFromCart: false,
+            itemQuantityIncreased: false,
+            itemAddedFromCart: false,
         }
     }
 
@@ -55,6 +61,93 @@ class Details extends React.Component {
 
     capitalizeFirstLetter = (string) => {
         return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+         //Function to get the index of the item
+    getIndex = (value, arr, prop) => {
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i][prop] === value) {
+                return i;
+            }
+        }
+        return -1; 
+    }
+
+    addToCartHandler = (item) => {
+        var totalAmount = this.state.totalAmount;
+        var totalItems = this.state.totalItems;
+        totalAmount += item.price;
+        totalItems += 1;
+
+        const newItem = this.state.cartItem;
+        newItem.id = item.id;
+        newItem.type = item.item_type;
+        newItem.name = item.item_name;
+        newItem.pricePerItem = item.price;
+        newItem.quantity = 1;
+        newItem.priceForAll = item.price;
+
+        this.setState({cartItem: newItem});
+
+        if (this.state.orderItems.items !== undefined && this.state.orderItems.items.some(a_item => (a_item.name === item.item_name))) {
+            var index = this.getIndex(item.item_name, this.state.orderItems.items, "name");
+            var quantity = this.state.orderItems.items[index].quantity + 1;
+            var priceForAll = this.state.orderItems.items[index].priceForAll + this.state.orderItems.items[index].pricePerItem;
+            var selectedItem = this.state.orderItems.items[index];
+            selectedItem.quantity = quantity;
+            selectedItem.priceForAll = priceForAll;
+            this.setState( selectedItem);
+        } else {
+            this.state.cartItems.push(this.state.cartItem);
+            const orderItems = this.state.orderItems;
+            orderItems.items = this.state.cartItems;
+            this.setState({orderItems: orderItems});
+        }
+
+        this.setState({open: true, cartItem: {}, totalItems: totalItems, totalAmount: totalAmount});
+    }
+
+    removeFromCartHandler = (item) => {
+        var index = this.getIndex(item.name, this.state.orderItems.items, "name");
+
+        if (this.state.orderItems.items[index].quantity > 1) {
+            var quantity = this.state.orderItems.items[index].quantity - 1;
+            var priceForAll = this.state.orderItems.items[index].priceForAll - this.state.orderItems.items[index].pricePerItem;
+            var selectedItem = this.state.orderItems.items[index];
+            selectedItem.quantity = quantity;
+            selectedItem.priceForAll = priceForAll;
+            this.setState(selectedItem);
+            this.setState({itemQuantityDecreased: true});
+        } else {
+            this.state.orderItems.items.splice(index, 1);
+            this.setState({itemRemovedFromCart: true});
+        }
+
+
+        var totalAmount = this.state.totalAmount;
+        var totalItems = this.state.totalItems;
+        totalAmount -= item.pricePerItem;
+        totalItems -= 1;
+
+        this.setState({totalItems: totalItems, totalAmount: totalAmount});
+
+    }
+
+
+    addAnItemFromCartHandler = (item, index) => {
+        const itemIndex = this.getIndex(item.name, this.state.orderItems.items, "name");
+
+        var quantity = this.state.orderItems.items[itemIndex].quantity + 1;
+        var priceForAll = this.state.orderItems.items[itemIndex].priceForAll + this.state.orderItems.items[itemIndex].pricePerItem;
+        var itemAdded = this.state.orderItems.items[itemIndex];
+        itemAdded.quantity = quantity;
+        itemAdded.priceForAll = priceForAll;
+        this.setState(item);
+        var totalAmount = this.state.totalAmount;
+        var totalItems = this.state.totalItems;
+        totalAmount += item.pricePerItem;
+        totalItems += 1;
+
+        this.setState({ itemQuantityIncreased: true, totalItems: totalItems, totalAmount: totalAmount });
     }
 
     render() {
@@ -131,7 +224,7 @@ class Details extends React.Component {
                                             <Grid item xs={1} lg={1}></Grid>
                                             <Grid item xs={2} lg={2}>
                                                 <IconButton style={{padding: 0, float: 'left'}}
-                                                            onClick={(e) => this.addToCartHandler(e, item.id, item.item_type, item.item_name, item.price)}>
+                                                            onClick={(e) => this.addToCartHandler(item)}>
                                                     <AddIcon style={{padding: 0}} fontSize='small'/>
                                                 </IconButton>
                                             </Grid>
@@ -154,8 +247,7 @@ class Details extends React.Component {
                                     </div>
                                     <div className="cart-item-list">
                                         <Grid container>
-                                            {
-                                                this.state.orderItems.items !== undefined ?
+                                            {this.state.orderItems.items !== undefined ?
                                                     this.state.orderItems.items.map((item, index) => (
                                                         <Fragment key={item.id}>
                                                             <Grid item xs={2} lg={2}>
@@ -176,17 +268,17 @@ class Details extends React.Component {
                                                                 <div className='add-remove-icon'>
                                                                     <IconButton className='add-remove-button-hover'
                                                                                 style={{display: "flex", padding: 0}}
-                                                                                onClick={(e) => this.removeFromCartHandler(e, item.id, item.type, item.name, item.pricePerItem)}><RemoveIcon
-                                                                        fontSize='default'
+                                                                                onClick={(e) => this.removeFromCartHandler(item)}><RemoveIcon
+                                                                        fontSize='medium'
                                                                         style={{color: 'black', fontWeight: "bolder"}}/></IconButton>
                                                                     <Typography
                                                                         style={{fontWeight: 'bold'}}>{item.quantity}</Typography>
                                                                     <IconButton className='add-remove-button-hover'
                                                                         style={{ display: "flex", padding: 0 }}
                                                                         onClick={this.addAnItemFromCartHandler.bind(this, item, index)}>
-                                                                        <AddIcon fontSize='default' style={{
+                                                                        <AddIcon fontSize='medium' style={{
                                                                             color: 'black',
-                                                                            fontWeight: "bolder"
+                                                                            fontWeight: "bold"
                                                                         }}/></IconButton>
                                                                 </div>
                                                             </Grid>
