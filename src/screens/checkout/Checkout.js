@@ -24,6 +24,10 @@ import Input from "@material-ui/core/Input";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormHelperText from "@material-ui/core/FormHelperText";
+import FormLabel from "@material-ui/core/FormLabel";
+import Radio from "@material-ui/core/Radio";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import RadioGroup from "@material-ui/core/RadioGroup";
 
 class Checkout extends Component {
     constructor() {
@@ -55,11 +59,11 @@ class Checkout extends Component {
         if(sessionStorage.getItem('access-token')) {
             this.getAddressData();
             this.getStatesData();
+            this.getPayments();
         }
     }
 
     incrementActiveStep = () => {
-        console.log(this.state.activeStep, this.state.selectedAddressId);
         if (this.state.activeStep === 0 && this.state.selectedAddressId === "") {
             //Do nothing as it is mandatory to select an address
         } else if (this.state.activeStep === 1 && this.state.paymentId === "") {
@@ -109,6 +113,20 @@ class Checkout extends Component {
             }
         });
         let url = this.props.baseUrl + '/states';
+        xhr.open('GET', url);
+        xhr.setRequestHeader("Cache-Control", "no-cache");
+        xhr.send();
+    }
+
+    getPayments = () => {
+        let xhr = new XMLHttpRequest();
+        let that = this;
+        xhr.addEventListener("readystatechange", function () {
+            if (this.readyState === 4) {
+                that.setState({payments: JSON.parse(this.responseText).paymentMethods});
+            }
+        });
+        let url = this.props.baseUrl + '/payment';
         xhr.open('GET', url);
         xhr.setRequestHeader("Cache-Control", "no-cache");
         xhr.send();
@@ -225,6 +243,10 @@ class Checkout extends Component {
 
     selectAddressHandler = (address) => {
         this.setState({selectedAddressId: address.id});
+    }
+
+    onPaymentSelection = (e) => {
+        this.setState({'paymentId': e.target.value});
     }
 
     render () {
@@ -374,7 +396,15 @@ class Checkout extends Component {
                                     <StepLabel>Payment</StepLabel>
                                     <StepContent>
                                         <div id='payment-modes'>
-                                            Payment modes
+                                            <FormControl>
+                                                <FormLabel>Select Mode of Payment</FormLabel>
+                                                <RadioGroup onChange={this.onPaymentSelection} value={this.state.paymentId}>
+                                                    {(this.state.payments || []).map((payment, index) => (
+                                                        <FormControlLabel key={payment.id} value={payment.id} control={<Radio/>}
+                                                                        label={payment.payment_name}/>
+                                                    ))}
+                                                </RadioGroup>
+                                            </FormControl>
                                         </div>
                                         <Button onClick={this.decrementActiveStep}>Back</Button>
                                         <Button variant="contained" color="primary"
