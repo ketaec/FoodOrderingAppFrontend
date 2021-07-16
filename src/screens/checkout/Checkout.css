@@ -5,3 +5,24 @@
 .display-none {
     display: none;
 }
+
+.item-selected-address {
+    margin: 10px;
+    border: 1px solid deeppink;
+    border-right: 3px solid deeppink;
+    border-bottom: 3px solid deeppink;
+    border-radius: 5px;
+    width: 30% !important;
+}
+
+.item-address { 
+    width: 30% !important;
+}
+
+.display-green-icon {
+    color: rgb(6 145 6);;
+}
+
+.display-grey-icon {
+    color: rgb(108 108 108);
+}

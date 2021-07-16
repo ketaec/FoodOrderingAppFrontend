@@ -12,8 +12,10 @@ import Grid from "@material-ui/core/Grid";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import AppBar from "@material-ui/core/AppBar";
-import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
+// import GridList from '@material-ui/core/GridList';
+// import GridListTile from '@material-ui/core/GridListTile';
+import ImageList from '@material-ui/core/ImageList';
+import ImageListItem from '@material-ui/core/ImageListItem';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import IconButton from "@material-ui/core/IconButton";
 import FormControl from "@material-ui/core/FormControl";
@@ -57,9 +59,10 @@ class Checkout extends Component {
     }
 
     incrementActiveStep = () => {
-        if (this.state.activeStep === 0 && this.state.selectedAddressId === undefined) {
+        console.log(this.state.activeStep, this.state.selectedAddressId);
+        if (this.state.activeStep === 0 && this.state.selectedAddressId === "") {
             //Do nothing as it is mandatory to select an address
-        } else if (this.state.activeStep === 1 && this.state.paymentId === '') {
+        } else if (this.state.activeStep === 1 && this.state.paymentId === "") {
             //Do nothing, Because user has to select payment to proceed further.
         } else {
             let activeState = this.state.activeStep + 1;
@@ -146,6 +149,82 @@ class Checkout extends Component {
 
     saveAddress = () => {
         //validations
+        let tempCityRequired = false;
+        let tempPincodeRequired = false;
+        let tempFlatRequired = false;
+        let tempStateRequired = false;
+        let tempLocalityRequired = false;
+        if (this.state.city === '' || this.state.cityRequired) {
+            tempCityRequired = true;
+        }
+
+        if (this.state.locality === '' || this.state.localityRequired) {
+            tempLocalityRequired = true;
+        }
+
+        if (this.state.flat === '' || this.state.flatRequired) {
+            tempFlatRequired = true;
+        }
+
+        if (this.state.stateUUID === '' || this.state.stateUUIDRequired) {
+            tempStateRequired = true;
+        }
+
+        if (this.state.pincode === '' || this.state.pincodeRequired) {
+            tempPincodeRequired = true;
+        }
+
+        if (tempFlatRequired || tempPincodeRequired || tempStateRequired || tempLocalityRequired || tempCityRequired) {
+            this.setState({
+                flatRequired: tempFlatRequired,
+                localityRequired: tempLocalityRequired,
+                cityRequired: tempCityRequired,
+                stateUUIDRequired: tempStateRequired,
+                pincodeRequired: tempPincodeRequired
+            })
+            return;
+        }
+
+        let address = {
+            city: this.state.city,
+            flat_building_name: this.state.flat,
+            locality: this.state.locality,
+            pincode: this.state.pincode,
+            state_uuid: this.state.stateUUID
+        }
+
+        let token = sessionStorage.getItem('access-token');
+        let xhr = new XMLHttpRequest();
+        let that = this;
+
+        xhr.addEventListener("readystatechange", function () {
+            if (this.readyState === 4) {
+                that.setState({city: '', locality: '', flat: '', stateUUID: '', pincode: ''});
+                that.changeActiveTab('existing_address');
+            }
+        });
+
+        let url = this.props.baseUrl + '/address';
+        xhr.open('POST', url);
+        xhr.setRequestHeader('authorization', 'Bearer ' + token);
+        xhr.setRequestHeader("Cache-Control", "no-cache");
+        xhr.setRequestHeader('content-type', 'application/json');
+        xhr.send(JSON.stringify(address));
+
+    }
+
+    validatePincode = (pincode) => {
+        if (pincode !== undefined && pincode.length !== 6) {
+            return false;
+        } else if (!isNaN(pincode) && pincode.length === 6) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    selectAddressHandler = (address) => {
+        this.setState({selectedAddressId: address.id});
     }
 
     render () {
@@ -179,11 +258,11 @@ class Checkout extends Component {
                                                     There are no saved addresses! You can save an address using the 'New
                                                     Address' tab or using your ‘Profile’ menu option.
                                                 </Typography> :
-                                                <GridList style={{flexWrap: 'nowrap'}} cols={3} cellHeight='auto'>
+                                                <ImageList style={{flexWrap: 'nowrap'}} cols={3} rowHeight='auto'>
                                                     {
                                                         (this.state.addresses || []).map((address, index) => (
-                                                            <GridListTile key={address.id}
-                                                                        className={this.state.selectedAddressId === address.id ? 'grid-list-tile-selected-address' : null}>
+                                                            <ImageListItem key={address.id}
+                                                                        className={this.state.selectedAddressId === address.id ? 'item-selected-address' : 'item-address'}>
                                                                 <div className='address-box'>
                                                                     <p>{address.flat_building_name}</p>
                                                                     <p>{address.locality}</p>
@@ -197,17 +276,17 @@ class Checkout extends Component {
                                                                         <IconButton
                                                                             id={'select-address-button-' + address.id}
                                                                             className='select-address-icon'
-                                                                            onClick={this.selectAddress}>
+                                                                            onClick={(e) => this.selectAddressHandler(address)}>
                                                                             <CheckCircleIcon
                                                                                 id={'select-address-icon-' + address.id}
                                                                                 className={this.state.selectedAddressId === address.id ? 'display-green-icon' : 'display-grey-icon'}/>
                                                                         </IconButton>
                                                                     </Grid>
                                                                 </Grid>
-                                                            </GridListTile>
+                                                            </ImageListItem>
                                                         ))
                                                     }
-                                                </GridList>
+                                                </ImageList>
                                             }
                                         </div>
                                         <div id='new-address-display'
