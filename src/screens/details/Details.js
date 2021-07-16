@@ -27,7 +27,6 @@ class Details extends React.Component {
             orderItems: {id: null, items: [], total: 0},
             cartItems: [],
             cartItem: {},
-            open: false,
             showCartEmpty: false,
             showNotloggedIn: false,
             itemQuantityDecreased: false,
@@ -162,7 +161,8 @@ class Details extends React.Component {
                 pathname: '/checkout/',
                 state: {
                     orderItems: this.state.orderItems,
-                    total: this.state.totalAmount, restaurantName: this.state.restaurant_name
+                    total: this.state.totalAmount, 
+                    restaurantName: this.state.restaurant_name
                 }
             })
         }
@@ -179,7 +179,6 @@ class Details extends React.Component {
                 <Header {...this.props}
                     baseUrl={this.props.baseUrl}
                     showSearch="false"
-                    searchHandler={this.searchHandler}
                 />
                 {/* restaurant information */}
                 <div className="restaurant-information">
