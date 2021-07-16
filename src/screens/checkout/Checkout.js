@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import {Redirect} from 'react-router-dom';
 import './Checkout.css';
 import Header from "../../common/header/Header";
@@ -28,6 +28,10 @@ import FormLabel from "@material-ui/core/FormLabel";
 import Radio from "@material-ui/core/Radio";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import RadioGroup from "@material-ui/core/RadioGroup";
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import Divider from "@material-ui/core/Divider";
+import 'font-awesome/css/font-awesome.min.css';
 
 class Checkout extends Component {
     constructor() {
@@ -56,6 +60,7 @@ class Checkout extends Component {
     }
 
     componentDidMount() { 
+        console.log(this.props.location.state)
         if(sessionStorage.getItem('access-token')) {
             this.getAddressData();
             this.getStatesData();
@@ -249,6 +254,10 @@ class Checkout extends Component {
         this.setState({'paymentId': e.target.value});
     }
 
+    capitalizeFirstLetter = (string) => {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
     render () {
         if (this.props.location.state === undefined || sessionStorage.getItem('access-token') === null) {
             return <Redirect to='/' />
@@ -256,7 +265,7 @@ class Checkout extends Component {
         return (
             <div>
                 <Header baseUrl={this.props.baseUrl} showSearch="false" />
-                <div className='main-container'>
+                <div className='content-container' >
                     <Grid container>
                         <Grid item xs={12} lg={9}>
                             <Stepper activeStep={this.state.activeStep} orientation='vertical'>
@@ -420,13 +429,74 @@ class Checkout extends Component {
                             </div>
                         </Grid>
                         <Grid item xs={12} lg={3}>
-                                <Typography variant='h5'>
-                                    Summary
-                                </Typography>
+                            <Card variant='elevation' className='summary-card'>
+                                <CardContent>
+                                    <Typography variant="h5" component="h2">
+                                        Summary
+                                    </Typography>
+                                    <br/>
+                                    <Typography variant='h6' component='h3' color='textSecondary'
+                                                style={{textTransform: "capitalize", marginBottom: 15}}>
+                                        {this.props.location.state.restaurantName}
+                                    </Typography>
+                                    <Grid container>
+                                        {this.props.location.state.orderItems.items !== undefined ?
+                                                this.props.location.state.orderItems.items.map((item, index) => (
+                                                    <Fragment key={item.id}>
+                                                        <Grid item xs={1} lg={1}>
+                                                            {item.type === "VEG" ?
+                                                                <i className="fa fa-stop-circle-o" aria-hidden="true"
+                                                                style={{ color: "green"}}></i>
+                                                                :
+                                                                <i className="fa fa-stop-circle-o" aria-hidden="true"
+                                                                style={{color: "red"}}></i>
+                                                            }
+                                                        </Grid>
+                                                        <Grid item xs={5} lg={6}>
+                                                            <Typography style={{color: 'gray'}}>
+                                                                {this.capitalizeFirstLetter(item.name)}
+                                                            </Typography>
+                                                        </Grid>
+                                                        <Grid item xs={2} lg={2} style={{flexWrap: "wrap", color: 'gray'}}>
+                                                            <div className='add-remove-icon'>
+                                                                <Typography>{item.quantity}</Typography>
+                                                            </div>
+                                                        </Grid>
+                                                        <Grid item xs={4} lg={3}>
+                                                            <span style={{float: 'right', color: 'gray'}}>
+                                                                <i className="fa fa-inr" aria-hidden="true"></i>
+                                                                <span style={{paddingLeft: "2px"}}>{item.priceForAll.toFixed(2)}</span>
+                                                            </span>
+                                                        </Grid>
+                                                    </Fragment>
+                                                )) : null}
+                                        <Divider style={{marginTop: "10px", marginBottom: "10px", width: '100%'}}/>
+                                        <Grid item xs={8} lg={9}>
+                                            <div style={{marginTop: 15, marginBottom: 15}}>
+                                                <span style={{fontWeight: '500'}}>Net Amount</span>
+                                            </div>
+                                        </Grid>
+                                        <Grid item xs={4} lg={3}>
+                                            <div style={{marginTop: 15, marginBottom: 15}}>
+                                                <span style={{fontWeight: '400', float: 'right'}}>
+                                                    <i className="fa fa-inr" aria-hidden="true"
+                                                        style={{paddingRight: "2px"}}></i>
+                                                        {this.props.location.state.total.toFixed(2)}
+                                                </span>
+                                            </div>
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <Button className="checkout" variant="contained" color="primary" onClick={this.checkoutHandler}>
+                                                <Typography>PLACE ORDER</Typography>
+                                            </Button>
+                                        </Grid>
+                                    </Grid>
+                                </CardContent>
+                            </Card>
                         </Grid>
                     </Grid>
                 </div>
-            </div>
+              </div>
         )
     }
 }
