@@ -16,6 +16,12 @@ import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import IconButton from "@material-ui/core/IconButton";
+import FormControl from "@material-ui/core/FormControl";
+import InputLabel from "@material-ui/core/InputLabel";
+import Input from "@material-ui/core/Input";
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
+import FormHelperText from "@material-ui/core/FormHelperText";
 
 class Checkout extends Component {
     constructor() {
@@ -24,16 +30,29 @@ class Checkout extends Component {
             activeStep: 0,
             addresses: [],
             payments: [],
+            states: [],
             displayChange: 'display-none',
             selectedAddressId: "",
             paymentId: "",
             activeTabValue: 'existing_address',
+            flat: '',
+            locality: '',
+            city: '',
+            stateUUID: '',
+            pincode: '',
+            flatRequired: false,
+            localityRequired: false,
+            cityRequired: false,
+            stateUUIDRequired: false,
+            pincodeRequired: false,
+            pincodeValid: true,
         }
     }
 
     componentDidMount() { 
         if(sessionStorage.getItem('access-token')) {
             this.getAddressData();
+            this.getStatesData();
         }
     }
 
@@ -78,11 +97,55 @@ class Checkout extends Component {
         xhr.send();
     }
 
+    getStatesData = () => {
+        let xhr = new XMLHttpRequest();
+        let that = this;
+        xhr.addEventListener("readystatechange", function () {
+            if (this.readyState === 4) {
+                that.setState({states: JSON.parse(this.responseText).states});
+            }
+        });
+        let url = this.props.baseUrl + '/states';
+        xhr.open('GET', url);
+        xhr.setRequestHeader("Cache-Control", "no-cache");
+        xhr.send();
+    }
+
     changeActiveTab = (value) => {
         this.setState({activeTabValue: value})
         if (value === 'existing_address') {
             this.getAddressData();
         }
+    }
+
+    onInputFieldChangeHandler = (e) => {
+        let stateKey = e.target.id;
+        let stateValue = e.target.value;
+
+        if (stateKey === undefined) {
+            stateKey = 'stateUUID';
+        }
+
+        let stateValueRequiredKey = stateKey + 'Required';
+        let stateKeyRequiredValue = false;
+        if (stateValue === '') {
+            stateKeyRequiredValue = true;
+        }
+
+        let validPincode = this.state.pincodeValid;
+        if (stateKey === 'pincode') {
+            validPincode = this.validatePincode(stateValue);
+        }
+
+        this.setState({
+            [stateKey]: stateValue,
+            [stateValueRequiredKey]: stateKeyRequiredValue,
+            'pincodeValid': validPincode
+        });
+    }
+
+    saveAddress = () => {
+        //validations
     }
 
     render () {
@@ -147,9 +210,81 @@ class Checkout extends Component {
                                                 </GridList>
                                             }
                                         </div>
-
-
-                                        <div>
+                                        <div id='new-address-display'
+                                            className={this.state.activeTabValue === 'new_address' ? 'display-block' : 'display-none'}>
+                                            <FormControl style={{minWidth: 300}} required>
+                                                <InputLabel htmlFor='flat'>Flat/Building No</InputLabel>
+                                                <Input id='flat' name='flat' type='text' value={this.state.flat}
+                                                    flat={this.state.flat}
+                                                    onChange={this.onInputFieldChangeHandler}/>
+                                                {this.state.flatRequired ? 
+                                                    <FormHelperText>
+                                                        <span style={{color: "red"}}>required</span>
+                                                    </FormHelperText> : null}
+                                            </FormControl>
+                                            <br/>
+                                            <br/>
+                                            <FormControl style={{minWidth: 300}} required>
+                                                <InputLabel htmlFor='locality'>Locality</InputLabel>
+                                                <Input id='locality' name='locality' type='text' value={this.state.locality}
+                                                    locality={this.state.locality}
+                                                    onChange={this.onInputFieldChangeHandler}/>
+                                                {this.state.localityRequired ? 
+                                                    <FormHelperText>
+                                                        <span style={{color: "red"}}>required</span>
+                                                    </FormHelperText> : null}
+                                            </FormControl>
+                                            <br/>
+                                            <br/>
+                                            <FormControl style={{minWidth: 300}} required>
+                                                <InputLabel htmlFor='city'>City</InputLabel>
+                                                <Input id='city' name='city' type='text' value={this.state.city}
+                                                    city={this.state.city}
+                                                    onChange={this.onInputFieldChangeHandler}/>
+                                                {this.state.cityRequired ? 
+                                                    <FormHelperText>
+                                                        <span style={{color: "red"}}>required</span>
+                                                    </FormHelperText> : null}
+                                            </FormControl>
+                                            <br/>
+                                            <br/>
+                                            <FormControl style={{minWidth: 300}} required>
+                                                <InputLabel htmlFor='stateUUID'>State</InputLabel>
+                                                <Select id='stateUUID' name='stateUUID' value={this.state.stateUUID}
+                                                        onChange={this.onInputFieldChangeHandler}>
+                                                    {this.state.states.map((state, index) => (
+                                                        <MenuItem key={state.id} value={state.id}>{state.state_name}</MenuItem>
+                                                    ))}
+                                                </Select>
+                                                {this.state.stateUUIDRequired ? 
+                                                    <FormHelperText>
+                                                        <span style={{color: "red"}}>required</span>
+                                                    </FormHelperText> : null}
+                                            </FormControl>
+                                            <br/>
+                                            <br/>
+                                            <FormControl style={{minWidth: 300}} required>
+                                                <InputLabel htmlFor='pincode'>Pincode</InputLabel>
+                                                <Input id='pincode' name='pincode' type='text' value={this.state.pincode}
+                                                    pincode={this.state.pincode}
+                                                    onChange={this.onInputFieldChangeHandler}/>
+                                                {this.state.pincodeRequired ? 
+                                                    <FormHelperText>
+                                                        <span style={{color: "red"}}>required</span>
+                                                    </FormHelperText> : null}
+                                                {!this.state.pincodeRequired && !this.state.pincodeValid ? 
+                                                    <FormHelperText>
+                                                        <span style={{color: "red"}}>Pincode must contain only numbers and must be 6 digits long</span>
+                                                    </FormHelperText> : null}
+                                            </FormControl>
+                                            <br/>
+                                            <br/>
+                                            <FormControl style={{minWidth: 150}}>
+                                                <Button variant='contained' color='secondary' onClick={this.saveAddress}>
+                                                    SAVE ADDRESS</Button>
+                                            </FormControl>
+                                        </div>
+                                        <div style={{marginTop: 20}}>
                                             <Button disabled={this.state.activeStep === 0}>Back</Button>
                                             <Button className='button' variant="contained" color="primary"
                                                     onClick={this.incrementActiveStep}>Next</Button>
