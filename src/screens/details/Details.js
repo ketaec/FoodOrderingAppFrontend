@@ -162,7 +162,7 @@ class Details extends React.Component {
                 state: {
                     orderItems: this.state.orderItems,
                     total: this.state.totalAmount, 
-                    restaurantName: this.state.restaurant_name
+                    restaurantName: this.state.restaurantDetails.restaurant_name
                 }
             })
         }
@@ -274,11 +274,11 @@ class Details extends React.Component {
                                                         <Fragment key={item.id}>
                                                             <Grid item xs={2} lg={2}>
                                                                 {item.type === "VEG" ?
-                                                                    <i className="fa fa-circle" aria-hidden="true"
-                                                                    style={{fontSize: "12px", color: "green", paddingRight: "12px"}}></i>
-                                                                   :
-                                                                   <i className="fa fa-circle" aria-hidden="true"
-                                                                   style={{fontSize: "12px", color: "red", paddingRight: "12px"}}></i>
+                                                                    <i className="fa fa-stop-circle-o" aria-hidden="true"
+                                                                    style={{ color: "green"}}></i>
+                                                                    :
+                                                                    <i className="fa fa-stop-circle-o" aria-hidden="true"
+                                                                    style={{color: "red"}}></i>
                                                                 }
                                                             </Grid>
                                                             <Grid item xs={3} lg={4}>
