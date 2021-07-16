@@ -8,6 +8,7 @@ import StepLabel from '@material-ui/core/StepLabel';
 import StepContent from "@material-ui/core/StepContent";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
+import Grid from "@material-ui/core/Grid";
 
 class Checkout extends Component {
     constructor() {
@@ -56,42 +57,49 @@ class Checkout extends Component {
             <div>
                 <Header baseUrl={this.props.baseUrl} showSearch="false" />
                 <div className='main-container'>
-                    <div className='delivery-payment-section'>
-                        <Stepper activeStep={this.state.activeStep} orientation='vertical'>
-                            <Step key='Delivery'>
-                                <StepLabel>Delivery</StepLabel>
-                                <StepContent>
-                                    <div>
-                                        Address
-                                    </div>
+                    <Grid container>
+                        <Grid item xs={12} lg={9}>
+                            <Stepper activeStep={this.state.activeStep} orientation='vertical'>
+                                <Step key='Delivery'>
+                                    <StepLabel>Delivery</StepLabel>
+                                    <StepContent>
+                                        <div>
+                                            Address
+                                        </div>
 
 
-                                    <div>
-                                        <Button disabled={this.state.activeStep === 0}>Back</Button>
-                                        <Button className='button' variant="contained" color="primary"
-                                                onClick={this.incrementActiveStep}>Next</Button>
-                                    </div>
-                                </StepContent>
-                            </Step>
-                            <Step key='Payment'>
-                                <StepLabel>Payment</StepLabel>
-                                <StepContent>
-                                    <div id='payment-modes'>
-                                        Payment modes
-                                    </div>
-                                    <Button onClick={this.decrementActiveStep}>Back</Button>
-                                    <Button variant="contained" color="primary"
-                                            onClick={this.incrementActiveStep}>Finish</Button>
-                                </StepContent>
-                            </Step>
-                        </Stepper>
-                        <div className={this.state.displayChange} >
-                            <Typography style={{marginLeft: 40}} variant='h5'>
-                                View the summary and place your order now!
-                            </Typography>
-                            <Button style={{marginLeft: 40, marginTop: 20}} onClick={this.resetActiveStep}>CHANGE</Button>
-                        </div>
-                    </div>
+                                        <div>
+                                            <Button disabled={this.state.activeStep === 0}>Back</Button>
+                                            <Button className='button' variant="contained" color="primary"
+                                                    onClick={this.incrementActiveStep}>Next</Button>
+                                        </div>
+                                    </StepContent>
+                                </Step>
+                                <Step key='Payment'>
+                                    <StepLabel>Payment</StepLabel>
+                                    <StepContent>
+                                        <div id='payment-modes'>
+                                            Payment modes
+                                        </div>
+                                        <Button onClick={this.decrementActiveStep}>Back</Button>
+                                        <Button variant="contained" color="primary"
+                                                onClick={this.incrementActiveStep}>Finish</Button>
+                                    </StepContent>
+                                </Step>
+                            </Stepper>
+                            <div className={this.state.displayChange} >
+                                <Typography style={{marginLeft: 40}} variant='h5'>
+                                    View the summary and place your order now!
+                                </Typography>
+                                <Button style={{marginLeft: 40, marginTop: 20}} onClick={this.resetActiveStep}>CHANGE</Button>
+                            </div>
+                        </Grid>
+                        <Grid item xs={12} lg={3}>
+                                <Typography variant='h5'>
+                                    Summary
+                                </Typography>
+                        </Grid>
+                    </Grid>
                 </div>
             </div>
         )
