@@ -15,6 +15,7 @@ class Checkout extends Component {
         super();
         this.state = {
             activeStep: 0,
+            addresses: [],
             payments: [],
             displayChange: 'display-none',
             selectedAddressId: "clear address",
@@ -23,7 +24,9 @@ class Checkout extends Component {
     }
 
     componentDidMount() { 
-        console.log(this.props.location.state);
+        if(sessionStorage.getItem('access-token')) {
+            this.getAddressData();
+        }
     }
 
     incrementActiveStep = () => {
@@ -49,6 +52,23 @@ class Checkout extends Component {
         this.setState({activeStep: 0, displayChange: 'display-none'})
     }
 
+    getAddressData = () => {
+        let xhr = new XMLHttpRequest();
+        let that = this;
+
+        xhr.addEventListener("readystatechange", function () {
+            if (this.readyState === 4) {
+                that.setState({addresses: JSON.parse(this.responseText).addresses});
+            }
+        });
+
+        let url = this.props.baseUrl + '/address/customer';
+        xhr.open('GET', url);
+        let token = sessionStorage.getItem('access-token');
+        xhr.setRequestHeader('authorization', 'Bearer ' + token);
+        xhr.setRequestHeader("Cache-Control", "no-cache");
+        xhr.send();
+    }
     render () {
         if (this.props.location.state === undefined || sessionStorage.getItem('access-token') === null) {
             return <Redirect to='/' />
