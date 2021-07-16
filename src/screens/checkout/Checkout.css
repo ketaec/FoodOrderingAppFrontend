@@ -26,3 +26,13 @@
 .display-grey-icon {
     color: rgb(108 108 108);
 }
+
+.summary-card {
+    margin: 30px 30px 0 0;
+}
+
+@media only screen and (max-width: 768px){
+    .summary-card {
+        margin: 5%;
+    }
+}
