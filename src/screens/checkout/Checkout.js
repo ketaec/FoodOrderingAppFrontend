@@ -31,6 +31,8 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Divider from "@material-ui/core/Divider";
+import Snackbar from "@material-ui/core/Snackbar";
+import CloseIcon from '@material-ui/icons/Close';
 import 'font-awesome/css/font-awesome.min.css';
 
 class Checkout extends Component {
@@ -56,6 +58,8 @@ class Checkout extends Component {
             stateUUIDRequired: false,
             pincodeRequired: false,
             pincodeValid: true,
+            placeOrderMessage: "",
+            showPlaceOrderMessage: false,
         }
     }
 
@@ -256,6 +260,63 @@ class Checkout extends Component {
 
     capitalizeFirstLetter = (string) => {
         return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    placeOrderHandler = () => {
+        if (this.state.selectedAddressId === '' || this.state.paymentId === '' || this.state.displayChange === 'display-none') {
+            this.setState({
+                placeOrderMessage: 'Unable to place your order! Please try again!',
+                showPlaceOrderMessage: true
+            })
+            return;
+        }
+
+        let bill = this.props.location.state.total;
+        let itemQuantities = [];
+        this.props.location.state.orderItems.items.map((item, index) => (
+            itemQuantities.push({item_id: item.id, price: item.quantity * item.pricePerItem, quantity: item.quantity})
+        ))
+        let order = {
+            address_id: this.state.selectedAddressId,
+            coupon_id: this.state.couponId,
+            item_quantities: itemQuantities,
+            payment_id: this.state.paymentId,
+            restaurant_id: this.props.location.state.orderItems.id,
+            bill: bill,
+            discount: 0
+        }
+
+        let token = sessionStorage.getItem('access-token');
+        let xhr = new XMLHttpRequest();
+        let that = this;
+        xhr.addEventListener("readystatechange", function () {
+                if (this.readyState === 4) {
+                    if (this.status === 201) {
+                        let orderId = JSON.parse(this.responseText).id;
+                        that.setState({
+                            placeOrderMessage: 'Order placed successfully! Your order ID is ' + orderId,
+                            showPlaceOrderMessage: true
+                        });
+                    } else {
+                        that.setState({
+                            placeOrderMessage: 'Unable to place your order! Please try again!',
+                            showPlaceOrderMessage: true
+                        });
+                    }
+                }
+            }
+        );
+
+        let url = this.props.baseUrl + '/order';
+        xhr.open('POST', url);
+        xhr.setRequestHeader('authorization', 'Bearer ' + token);
+        xhr.setRequestHeader("Cache-Control", "no-cache");
+        xhr.setRequestHeader('content-type', 'application/json');
+        xhr.send(JSON.stringify(order));
+    }
+
+    placeOrderMessageClose = () => {
+        this.setState({showPlaceOrderMessage: false});
     }
 
     render () {
@@ -486,7 +547,7 @@ class Checkout extends Component {
                                             </div>
                                         </Grid>
                                         <Grid item xs={12}>
-                                            <Button className="checkout" variant="contained" color="primary" onClick={this.checkoutHandler}>
+                                            <Button className="checkout" variant="contained" color="primary" onClick={this.placeOrderHandler}>
                                                 <Typography>PLACE ORDER</Typography>
                                             </Button>
                                         </Grid>
@@ -496,6 +557,16 @@ class Checkout extends Component {
                         </Grid>
                     </Grid>
                 </div>
+                <Snackbar anchorOrigin={{vertical: 'bottom', horizontal: 'left'}} key='01'
+                    message={this.state.placeOrderMessage}
+                    open={this.state.showPlaceOrderMessage}
+                    onClose={this.placeOrderMessageClose}
+                    autoHideDuration={4000}
+                    action={
+                    <Fragment> 
+                        <IconButton color='inherit' onClick={this.placeOrderMessageClose}><CloseIcon/></IconButton>
+                    </Fragment>
+                }/>
               </div>
         )
     }
