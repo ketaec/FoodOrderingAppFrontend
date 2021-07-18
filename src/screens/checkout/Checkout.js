@@ -33,6 +33,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Divider from "@material-ui/core/Divider";
 import Snackbar from "@material-ui/core/Snackbar";
 import CloseIcon from '@material-ui/icons/Close';
+import TextField from '@material-ui/core/TextField';
 import 'font-awesome/css/font-awesome.min.css';
 
 class Checkout extends Component {
@@ -60,6 +61,11 @@ class Checkout extends Component {
             pincodeValid: true,
             placeOrderMessage: "",
             showPlaceOrderMessage: false,
+            couponId: "",
+            couponCode: "",
+            discount: 0,
+            discountAmount: 0,
+            finalTotal: 0,
         }
     }
 
@@ -70,13 +76,16 @@ class Checkout extends Component {
             this.getStatesData();
             this.getPayments();
         }
+        this.setState({finalTotal: this.props.location.state.total});
     }
 
     incrementActiveStep = () => {
         if (this.state.activeStep === 0 && this.state.selectedAddressId === "") {
             //Do nothing as it is mandatory to select an address
+            return;
         } else if (this.state.activeStep === 1 && this.state.paymentId === "") {
             //Do nothing, Because user has to select payment to proceed further.
+            return;
         } else {
             let activeState = this.state.activeStep + 1;
             let changeAddressPayment = 'display-none';
@@ -271,7 +280,7 @@ class Checkout extends Component {
             return;
         }
 
-        let bill = this.props.location.state.total;
+        let bill = this.state.finalTotal;
         let itemQuantities = [];
         this.props.location.state.orderItems.items.map((item, index) => (
             itemQuantities.push({item_id: item.id, price: item.quantity * item.pricePerItem, quantity: item.quantity})
@@ -281,9 +290,9 @@ class Checkout extends Component {
             coupon_id: this.state.couponId,
             item_quantities: itemQuantities,
             payment_id: this.state.paymentId,
-            restaurant_id: this.props.location.state.orderItems.id,
+            restaurant_id: this.props.location.state.restaurantId,
             bill: bill,
-            discount: 0
+            discount: this.state.discount
         }
 
         let token = sessionStorage.getItem('access-token');
@@ -317,6 +326,39 @@ class Checkout extends Component {
 
     placeOrderMessageClose = () => {
         this.setState({showPlaceOrderMessage: false});
+    }
+
+    couponCodeInputFieldChangeHandler = (e) => {
+        this.setState({couponCode: e.target.value });
+    }
+
+    getCouponDetails = () => {
+        console.log(this.state.couponCode);
+        let token = sessionStorage.getItem('access-token');
+        let xhr = new XMLHttpRequest();
+        let that = this;
+        xhr.addEventListener("readystatechange", function () {
+                if (this.readyState === 4) {
+                    if (this.status === 200) {
+                        console.log(JSON.parse(this.responseText));
+                        const responseText = JSON.parse(this.responseText);
+                        const discount = responseText.percent;
+                        const discountAmount = that.props.location.state.total * (responseText.percent/100);
+                        const totalAmount = that.props.location.state.total - discountAmount;
+                        that.setState({couponId: responseText.id, discount: discount, discountAmount: discountAmount, finalTotal: totalAmount});
+                    } else {
+                        console.log("coupon not found");
+                        that.setState({discount: 0, discountAmount: 0, finalTotal: that.props.location.state.total});
+                    }
+                }
+            }
+        );
+
+        let url = this.props.baseUrl + '/order/coupon/' + this.state.couponCode;
+        xhr.open('GET', url);
+        xhr.setRequestHeader('authorization', 'Bearer ' + token);
+        xhr.setRequestHeader("Cache-Control", "no-cache");
+        xhr.send();
     }
 
     render () {
@@ -531,6 +573,36 @@ class Checkout extends Component {
                                                         </Grid>
                                                     </Fragment>
                                                 )) : null}
+                                        <Grid item xs={8} lg={9} style={{marginTop: "10px"}}>
+                                            <form noValidate autoComplete="off">
+                                                <TextField label="Coupon Code" variant="filled" onChange={this.couponCodeInputFieldChangeHandler} />
+                                            </form>
+                                        </Grid>
+                                        <Grid item xs={4} lg={3} style={{marginTop: "20px"}}>
+                                            <Button variant="contained" onClick={this.getCouponDetails}>
+                                                <Typography>APPLY</Typography>
+                                            </Button>
+                                        </Grid>
+                                        <Grid item xs={8} lg={9} style={{marginTop: "10px"}}>
+                                            <Typography style={{color: 'gray'}}>Sub Total</Typography>
+                                        </Grid>
+                                        <Grid item xs={4} lg={3} style={{marginTop: "10px"}}>
+                                                <span style={{fontWeight: '400', float: 'right', color: 'gray'}}>
+                                                    <i className="fa fa-inr" aria-hidden="true"
+                                                        style={{paddingRight: "2px"}}></i>
+                                                        {this.props.location.state.total.toFixed(2)}
+                                                </span>
+                                        </Grid>
+                                        <Grid item xs={8} lg={9} style={{marginTop: "10px"}}>
+                                            <Typography style={{color: 'gray'}}>Discount</Typography>
+                                        </Grid>
+                                        <Grid item xs={4} lg={3} style={{marginTop: "10px"}}>
+                                                <span style={{fontWeight: '400', float: 'right', color: 'gray'}}>
+                                                    <i className="fa fa-inr" aria-hidden="true"
+                                                        style={{paddingRight: "2px"}}></i>
+                                                        {this.state.discountAmount.toFixed(2)}
+                                                </span>
+                                        </Grid>
                                         <Divider style={{marginTop: "10px", marginBottom: "10px", width: '100%'}}/>
                                         <Grid item xs={8} lg={9}>
                                             <div style={{marginTop: 15, marginBottom: 15}}>
@@ -542,7 +614,7 @@ class Checkout extends Component {
                                                 <span style={{fontWeight: '400', float: 'right'}}>
                                                     <i className="fa fa-inr" aria-hidden="true"
                                                         style={{paddingRight: "2px"}}></i>
-                                                        {this.props.location.state.total.toFixed(2)}
+                                                        {this.state.finalTotal.toFixed(2)}
                                                 </span>
                                             </div>
                                         </Grid>
