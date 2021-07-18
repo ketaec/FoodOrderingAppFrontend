@@ -14,6 +14,8 @@ import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import Typography from "@material-ui/core/Typography";
 import Snackbar from '@material-ui/core/Snackbar';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import { withStyles } from "@material-ui/core/styles";
 import './Header.css';
 
@@ -68,6 +70,7 @@ class Header extends Component {
             pswd: "",
             contact: "",
             openOptions: false,
+            anchorEl: null,
             showLoggedInSuccessfullyMessage: false,
             showSignupSuccessfullyMessage: false,
         }
@@ -367,13 +370,13 @@ class Header extends Component {
         xhrSignup.send(dataSignUp);
     };
 
-    profileClickHandler = () => {
-          if (this.state["openOptions"]) {
-            this.setState({ "openOptions": false });
-          } else {
-            this.setState({ "openOptions": true });
-          }
+    profileClickHandler = (e) => {
+      this.setState({ "openOptions": true, 'anchorEl': e.currentTarget });
     };
+
+    loginHandleClose = () => {
+      this.setState({ "openOptions": false, 'anchorEl': null  });
+    }
 
     profilePageNavigationHandler = () => {
         this.props.history.push("/profile");
@@ -382,7 +385,7 @@ class Header extends Component {
     logoutClickHandler = () => {
         let that = this;
         let dataSignUp = null;
-        this.setState({ "openOptions": false });
+        this.setState({ "openOptions": false, 'anchorEl': null });
     
         let xhrSignup = new XMLHttpRequest();
         xhrSignup.addEventListener("readystatechange", function () {
@@ -444,7 +447,7 @@ class Header extends Component {
                             <FastfoodIcon fontSize="large" />
                         </div>
                     </Grid>
-                    <Grid item xs={12} sm={12} md={6}>
+                    <Grid item xs={12} sm={12} md={5}>
                       {this.props.showSearch === "true" ?
                         <div className="search-container">
                             <TextField
@@ -464,7 +467,7 @@ class Header extends Component {
                         : ""
                       }
                     </Grid>
-                    <Grid item xs={12} sm={12} md={1}>
+                    <Grid item xs={12} sm={12} md={2}>
                         <div className="login-btn">
                         {!this.state.loggedIn && (
                             <Button
@@ -478,16 +481,22 @@ class Header extends Component {
                             </Button>
                         )}
                         {this.state.loggedIn && ( 
-                            <div
-                                onClick={this.profileClickHandler}
-                                className="header-login-btn-div"
-                            >
-                                <div className="logged-in-user-first-name-div">
-                                <AccountCircleIcon />
-                                <p className="loggedInUserName-para">
-                                    {this.state.loggedInUserFirstName}
-                                </p>
-                                </div>
+                            <div className="header-login-btn-div">
+                              <AccountCircleIcon />
+                              <Button aria-controls="login-menu" style={{marginBottom: 14, marginRight:5, color:"white"}}
+                                aria-haspopup="true" onClick={this.profileClickHandler}>
+                                {this.state.loggedInUserFirstName}
+                              </Button>
+                              <Menu
+                                id="login-menu"
+                                anchorEl={this.state.anchorEl}
+                                keepMounted
+                                open={Boolean(this.state.openOptions)}
+                                onClose={this.loginHandleClose}
+                              >
+                                <MenuItem onClick={this.profilePageNavigationHandler}>Profile</MenuItem>
+                                <MenuItem onClick={this.logoutClickHandler}>Logout</MenuItem>
+                              </Menu>
                             </div>
                         )}
                         </div>
@@ -695,16 +704,6 @@ class Header extends Component {
                     )}
                 </TabContainer>
                 </Modal>
-                <div>
-                    {this.state.openOptions && (
-                        <div className="account-options-container">
-                            <div>
-                                <p onClick={this.profilePageNavigationHandler}>My Profile</p>
-                            </div>
-                            <p onClick={this.logoutClickHandler}>Logout</p>
-                        </div>
-                    )}
-                </div>
                 {/* registration successful message */}
                 <Snackbar
                     anchorOrigin={{
