@@ -37,8 +37,8 @@ import TextField from '@material-ui/core/TextField';
 import 'font-awesome/css/font-awesome.min.css';
 
 class Checkout extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             activeStep: 0,
             addresses: [],
@@ -573,12 +573,12 @@ class Checkout extends Component {
                                                         </Grid>
                                                     </Fragment>
                                                 )) : null}
-                                        <Grid item xs={8} lg={9} style={{marginTop: "10px"}}>
+                                        <Grid item xs={9} lg={9} style={{marginTop: "10px"}}>
                                             <form noValidate autoComplete="off">
                                                 <TextField label="Coupon Code" variant="filled" onChange={this.couponCodeInputFieldChangeHandler} />
                                             </form>
                                         </Grid>
-                                        <Grid item xs={4} lg={3} style={{marginTop: "20px"}}>
+                                        <Grid item xs={3} lg={3} style={{marginTop: "20px"}}>
                                             <Button variant="contained" onClick={this.getCouponDetails}>
                                                 <Typography>APPLY</Typography>
                                             </Button>
