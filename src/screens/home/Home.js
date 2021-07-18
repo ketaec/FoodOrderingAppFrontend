@@ -41,6 +41,7 @@ class Home extends Component {
         })
         xhrRestaurants.open('GET', this.props.baseUrl + '/restaurant');
         xhrRestaurants.send(dataRestaurants);
+        this.noOfColumns();
         window.addEventListener('resize', this.noOfColumns);
     }
 
@@ -70,7 +71,6 @@ class Home extends Component {
     }
 
     noOfColumns = () => {
-
         if (window.innerWidth >= 320 && window.innerWidth <= 600) {
             this.setState({cards: 1});
             return;
