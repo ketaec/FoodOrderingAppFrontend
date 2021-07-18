@@ -22,7 +22,8 @@
 
 .login-btn {
     margin-top: 10px;
-    margin-bottom: 10px;
+    float: right;
+    margin-right: 15px;
 }
 
 .form-control-container{
@@ -66,9 +67,8 @@
 }
 
 .header-login-btn-div {
-    margin-top: 10px;
-    margin-bottom: 5px;
     cursor: pointer;
+    float: right;
 }
 
 .loggedInUserName-para {
@@ -91,4 +91,18 @@
     font-weight: 500;
     right: 5px;
     cursor: pointer;
+}
+
+@media only screen and (max-width: 768px){ 
+    .header-login-btn-div {
+        cursor: pointer;
+        float: left;
+    }
+
+    .login-btn {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        float: left;
+        margin-left: 5px;
+    }
 }
