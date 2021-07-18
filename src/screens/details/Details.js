@@ -162,7 +162,8 @@ class Details extends React.Component {
                 state: {
                     orderItems: this.state.orderItems,
                     total: this.state.totalAmount, 
-                    restaurantName: this.state.restaurantDetails.restaurant_name
+                    restaurantName: this.state.restaurantDetails.restaurant_name,
+                    restaurantId: this.state.restaurantDetails.id
                 }
             })
         }
