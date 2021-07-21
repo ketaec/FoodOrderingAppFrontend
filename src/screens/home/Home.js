@@ -45,6 +45,7 @@ class Home extends Component {
         window.addEventListener('resize', this.noOfColumns);
     }
 
+    // search handler function
     searchHandler = (event) => {
         let _this = this;
         let dataRestaurants = null;
@@ -70,6 +71,7 @@ class Home extends Component {
         xhrRestaurants.send(dataRestaurants);
     }
 
+    // function to set number of cards dynamically
     noOfColumns = () => {
         if (window.innerWidth >= 320 && window.innerWidth <= 600) {
             this.setState({cards: 1});
@@ -93,10 +95,12 @@ class Home extends Component {
 
     }
 
+    // restaurant card on click handler
     restaurantCardOnClickHandler = (restaurantId) => {
         this.props.history.push('/restaurant/' + restaurantId);
     }
 
+    // renderer function
     render() {
         return (
             <div>

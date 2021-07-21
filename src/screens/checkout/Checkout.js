@@ -104,6 +104,7 @@ class Checkout extends Component {
         this.setState({activeStep: 0, displayChange: 'display-none'})
     }
 
+    // function to get address data
     getAddressData = () => {
         let xhr = new XMLHttpRequest();
         let that = this;
@@ -122,6 +123,7 @@ class Checkout extends Component {
         xhr.send();
     }
 
+    // function to get states data
     getStatesData = () => {
         let xhr = new XMLHttpRequest();
         let that = this;
@@ -136,6 +138,7 @@ class Checkout extends Component {
         xhr.send();
     }
 
+    // function to get payments data
     getPayments = () => {
         let xhr = new XMLHttpRequest();
         let that = this;
@@ -183,6 +186,7 @@ class Checkout extends Component {
         });
     }
 
+    // function to save address data
     saveAddress = () => {
         //validations
         let tempCityRequired = false;
@@ -271,6 +275,7 @@ class Checkout extends Component {
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
 
+    // place order handler
     placeOrderHandler = () => {
         if (this.state.selectedAddressId === '' || this.state.paymentId === '' || this.state.displayChange === 'display-none') {
             this.setState({
@@ -332,6 +337,7 @@ class Checkout extends Component {
         this.setState({couponCode: e.target.value });
     }
 
+    // function to get coupon details
     getCouponDetails = () => {
         console.log(this.state.couponCode);
         let token = sessionStorage.getItem('access-token');

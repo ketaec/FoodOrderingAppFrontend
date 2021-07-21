@@ -42,6 +42,7 @@ class Details extends React.Component {
         this.getRestaurantDetails(id);
     }
 
+    // function to get restaurant details
     getRestaurantDetails = (id) => {
         let that = this;
         let dataRestaurants = null;
@@ -56,14 +57,15 @@ class Details extends React.Component {
                     locality: responseText.address.locality});
             }
         })
-        xhrRestaurants.open('GET', this.props.baseUrl + '/api/restaurant/' + id);
+        xhrRestaurants.open('GET', this.props.baseUrl + '/restaurant/' + id);
         xhrRestaurants.send(dataRestaurants);
     }
 
     capitalizeFirstLetter = (string) => {
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
-         //Function to get the index of the item
+
+    //Function to get the index of the item
     getIndex = (value, arr, prop) => {
         for (let i = 0; i < arr.length; i++) {
             if (arr[i][prop] === value) {
@@ -73,6 +75,7 @@ class Details extends React.Component {
         return -1; 
     }
 
+    // function to add item to the ShoppingCart
     addToCartHandler = (item) => {
         var totalAmount = this.state.totalAmount;
         var totalItems = this.state.totalItems;
@@ -107,6 +110,7 @@ class Details extends React.Component {
         this.setState({showItemAddedMessage: true, cartItem: {}, totalItems: totalItems, totalAmount: totalAmount});
     }
 
+    // function to remove item from ShoppingCart
     removeFromCartHandler = (item) => {
         var index = this.getIndex(item.name, this.state.orderItems.items, "name");
 
@@ -133,7 +137,7 @@ class Details extends React.Component {
 
     }
 
-
+    // add item from cart handler
     addAnItemFromCartHandler = (item, index) => {
         const itemIndex = this.getIndex(item.name, this.state.orderItems.items, "name");
 
@@ -151,6 +155,7 @@ class Details extends React.Component {
         this.setState({ itemQuantityIncreased: true, totalItems: totalItems, totalAmount: totalAmount });
     }
 
+    // checkout handler
     checkoutHandler = () => {
         if (this.state.totalItems === 0) {
             this.setState({showCartEmpty: true});
