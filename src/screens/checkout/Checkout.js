@@ -61,9 +61,9 @@ class Checkout extends Component {
             pincodeValid: true,
             placeOrderMessage: "",
             showPlaceOrderMessage: false,
-            couponId: "",
+            couponId: null,
             couponCode: "",
-            discount: 0,
+            discount: null,
             discountAmount: 0,
             finalTotal: 0,
         }
@@ -354,7 +354,7 @@ class Checkout extends Component {
                         that.setState({couponId: responseText.id, discount: discount, discountAmount: discountAmount, finalTotal: totalAmount});
                     } else {
                         console.log("coupon not found");
-                        that.setState({discount: 0, discountAmount: 0, finalTotal: that.props.location.state.total});
+                        that.setState({discount: null, discountAmount: 0, finalTotal: that.props.location.state.total});
                     }
                 }
             }
