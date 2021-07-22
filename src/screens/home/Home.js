@@ -45,6 +45,11 @@ class Home extends Component {
         window.addEventListener('resize', this.noOfColumns);
     }
 
+    componentWillUnmount(){
+        console.log("unmount call");
+        window.removeEventListener('resize', this.noOfColumns);
+    }
+
     // search handler function
     searchHandler = (event) => {
         let _this = this;
